@@ -2,12 +2,22 @@ package ninja.paranoidandroid.firebasemessaging;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import ninja.paranoidandroid.firebasemessaging.models.ProjectTasks;
+import ninja.paranoidandroid.firebasemessaging.models.Task;
+
 public class AddTask extends AppCompatActivity {
+
+    //Log
+    private final static String TAG = "Add task";
 
     //UI
     private EditText mTaskNameEditText;
@@ -21,6 +31,9 @@ public class AddTask extends AppCompatActivity {
 
     //Task project key
     private String mTaskProjectKey;
+
+    //Firebase
+    private DatabaseReference mFireBaseReference;
 
 
     @Override
@@ -50,6 +63,13 @@ public class AddTask extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        mFireBaseReference = FirebaseDatabase.getInstance().getReference();
+    }
+
     private void setListeners(){
 
         mCancelButton.setOnClickListener(new View.OnClickListener() {
@@ -63,9 +83,48 @@ public class AddTask extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
+                Log.i(TAG, "Ok is clicked");
+
+                String name = mTaskNameEditText.getText().toString();
+                String dateOfCreation = mTaskDateOfCreationEditText.getText().toString();
+                String dateOfCompletition = mTaskDateOfCompletitionEditText.getText().toString();
+                String problem = mTaskProblemEditText.getText().toString();
+                String notes = mTaskNotesEditText.getText().toString();
+
+                Task task = createProjectTask(name, dateOfCreation, dateOfCompletition, problem, notes);
+
+                DatabaseReference newTaskRef = mFireBaseReference.child("task").push();
+                newTaskRef.setValue(task);
+                String newTaskKey = newTaskRef.getKey();
+
+                DatabaseReference projectTasksReference = mFireBaseReference.child("project-tasks/" + mTaskProjectKey +"/" + newTaskKey);
+                ProjectTasks projectTasks = createProjectTasksitem(name, dateOfCreation, dateOfCompletition);
+                projectTasksReference.setValue(projectTasks);
             }
         });
 
+    }
+
+    private Task createProjectTask(String name, String dateOfCreation, String dateOfCompletition, String problem, String notes){
+
+        Task task = new Task();
+        task.setName(name);
+        task.setDateOfCreation(dateOfCreation);
+        task.setDateOfCompletion(dateOfCompletition);
+        task.setProblem(problem);
+        task.setNotes(notes);
+
+        return task;
+    }
+
+    private ProjectTasks createProjectTasksitem(String name, String dateOfCreation, String dateOfCompletition){
+
+        ProjectTasks projectTasks = new ProjectTasks();
+        projectTasks.setName(name);
+        projectTasks.setStartDate(dateOfCompletition);
+        projectTasks.setEndDate(dateOfCompletition);
+
+        return projectTasks;
     }
 
 }

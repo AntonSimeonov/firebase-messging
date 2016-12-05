@@ -20,17 +20,11 @@
         android:layout_height="wrap_content"
         android:layout_toRightOf="@id/tv_task_listview_row_creation_date"
         />
-    <TextView
-        android:id="@+id/tv_task_listview_row_problem"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/tv_task_listview_row_name"
-        />
     <ToggleButton
         android:id="@+id/tb_task_listview_row_status"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/tv_task_listview_row_problem"
+        android:layout_toRightOf="@id/tv_task_listview_row_completition_date"
         android:layout_below="@id/tv_task_listview_row_name"
         />
 

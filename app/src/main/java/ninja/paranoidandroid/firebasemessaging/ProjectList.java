@@ -7,6 +7,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -19,6 +20,9 @@ import ninja.paranoidandroid.firebasemessaging.models.Project;
 
 public class ProjectList extends AppCompatActivity {
 
+    //Log
+    private final static String TAG = "ProjectList";
+
     //UI
     private ListView mProjectsListView;
 
@@ -26,6 +30,7 @@ public class ProjectList extends AppCompatActivity {
     private DatabaseReference mFirebaseReference;
     private FirebaseListAdapter<CompanyProjects> mProjectListAdapter;
 
+    //Obj members
     private String companyKey;
 
 
@@ -82,6 +87,22 @@ public class ProjectList extends AppCompatActivity {
     private void initView(){
 
         mProjectsListView = (ListView) findViewById(R.id.lv_content_project_list_projects);
+        setListViewOnitemClickListener();
+    }
+
+    private void setListViewOnitemClickListener(){
+
+        mProjectsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+                String key = mProjectListAdapter.getRef(i).getKey();
+                Intent intent = new Intent(ProjectList.this, ProjectSpace.class);
+                intent.putExtra("PROJECT_KEY", key);
+                startActivity(intent);
+
+            }
+        });
 
     }
 }

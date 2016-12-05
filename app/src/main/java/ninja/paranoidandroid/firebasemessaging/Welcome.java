@@ -1,17 +1,26 @@
 package ninja.paranoidandroid.firebasemessaging;
 
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import ninja.paranoidandroid.firebasemessaging.models.Company;
 import ninja.paranoidandroid.firebasemessaging.models.Project;
 import ninja.paranoidandroid.firebasemessaging.models.Task;
+import ninja.paranoidandroid.firebasemessaging.util.Constants;
 
 public class Welcome extends AppCompatActivity {
+
+    //Firebase
+    private FirebaseAuth mFireAuth;
+    private FirebaseAuth.AuthStateListener mAuthStateListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,9 +28,41 @@ public class Welcome extends AppCompatActivity {
         setContentView(R.layout.activity_welcome);
 
 
+        Log.i(Constants.Log.TAG_WELCOME, "onCerate()");
         //initFireBaseDb();
         getOutFromInitialisation();
 
+        mFireAuth = FirebaseAuth.getInstance();
+        mAuthStateListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                if (user != null) {
+                    // User is signed in
+                    Log.d(Constants.Log.TAG_WELCOME, "onAuthStateChanged:signed_in:" + user.getUid());
+                } else {
+                    // User is signed out
+                    Log.d(Constants.Log.TAG_WELCOME, "onAuthStateChanged:signed_out");
+                }
+
+            }
+        };
+
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        mFireAuth.addAuthStateListener(mAuthStateListener);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        if(mAuthStateListener != null){
+            mFireAuth.removeAuthStateListener(mAuthStateListener);
+        }
     }
 
     private void getOutFromInitialisation(){
